@@ -26,6 +26,8 @@ public class Hook : MonoBehaviour {
 
 	private float grappleDistance = 0f;
 
+	public GameObject blocker; 
+
 
 	// Use this for initialization
 	void Start () {
@@ -96,6 +98,9 @@ public class Hook : MonoBehaviour {
 	void applyGrapple()
 	{
 		castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
+		Vector3 dir = (grapplePoint - this.transform.position).normalized;
+		blocker.transform.position = grapplePoint - dir*(grappleDistance);
+		blocker.transform.rotation = Quaternion.LookRotation(grapplePoint-blocker.transform.position);
 	/*
 		else if (Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
 		{
@@ -123,6 +128,7 @@ public class Hook : MonoBehaviour {
 			//centripetalForce /= grappleDistance;
 
 		}*/
+		/* 
 		if (Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
 		{
 			float diff = Vector3.Distance(transform.position,grapplePoint) - grappleDistance;
