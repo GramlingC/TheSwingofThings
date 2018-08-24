@@ -382,6 +382,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontalSensitivity: 2
   verticalSensitivity: 2
+  angleFromTrueTop: 10
 --- !u!135 &1295990262
 SphereCollider:
   m_ObjectHideFlags: 0
