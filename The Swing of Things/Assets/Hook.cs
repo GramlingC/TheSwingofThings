@@ -11,7 +11,7 @@ public class Hook : MonoBehaviour {
 
 	public float springConstant = 300f;
 
-	public float springRatio = .5f;
+	public float springRatio = 20f;
 	private Rigidbody rb;
 
 	private Vector3 velocity;
@@ -25,8 +25,6 @@ public class Hook : MonoBehaviour {
 	private LineRenderer line;
 
 	private float grappleDistance = 0f;
-
-	public GameObject blocker; 
 
 
 	// Use this for initialization
@@ -98,9 +96,8 @@ public class Hook : MonoBehaviour {
 	void applyGrapple()
 	{
 		castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
-		Vector3 dir = (grapplePoint - this.transform.position).normalized;
-		blocker.transform.position = grapplePoint - dir*(grappleDistance);
-		blocker.transform.rotation = Quaternion.LookRotation(grapplePoint-blocker.transform.position);
+
+		float distanceMultiplier = springRatio + 1f;
 	/*
 		else if (Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
 		{
@@ -128,17 +125,17 @@ public class Hook : MonoBehaviour {
 			//centripetalForce /= grappleDistance;
 
 		}*/
-		/* 
-		if (Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
+		 
+		if (distanceMultiplier * Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
 		{
-			float diff = Vector3.Distance(transform.position,grapplePoint) - grappleDistance;
+			float diff = distanceMultiplier * Vector3.Distance(transform.position,grapplePoint) -grappleDistance;
 			//transform.position = transform.position + diff * ((grapplePoint-transform.position).normalized);
 			
-			float springFunction = (diff)/(grappleDistance*springRatio);
+			float springFunction = (diff)/((grappleDistance)*springRatio);
 			float springForce = springFunction*springFunction*springConstant;
 			rb.AddForce((grapplePoint-transform.position)*springForce * Time.deltaTime);
 		}
-		//*/
+		
 	}
 
 	 void OnGUI(){
