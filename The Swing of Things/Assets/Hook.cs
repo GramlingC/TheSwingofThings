@@ -125,6 +125,8 @@ public class Hook : MonoBehaviour {
 			//centripetalForce /= grappleDistance;
 
 		}*/
+
+		Vector3 springPull = (grapplePoint-transform.position).normalized + .5f * (grapplePoint-transform.position);
 		 
 		if (distanceMultiplier * Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
 		{
@@ -133,9 +135,15 @@ public class Hook : MonoBehaviour {
 			
 			float springFunction = (diff)/((grappleDistance)*springRatio);
 			float springForce = springFunction*springFunction*springConstant;
-			rb.AddForce((grapplePoint-transform.position)*springForce * Time.deltaTime);
+
+			springPull *= springForce;
+		}
+		else if (Vector3.Distance(transform.position,grapplePoint) < grappleDistance)
+		{
+			grappleDistance = Vector3.Distance(transform.position,grapplePoint);
 		}
 		
+		rb.AddForce(springPull * Time.deltaTime);
 	}
 
 	 void OnGUI(){
