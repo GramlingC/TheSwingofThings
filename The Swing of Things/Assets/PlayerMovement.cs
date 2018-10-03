@@ -48,7 +48,7 @@ public class PlayerMovement : MonoBehaviour {
         //get key down will release an existing grapple
         if (hook.lineIsActive)
         {
-            if (Input.GetKeyDown(grappleKey))
+            if (Input.GetKeyUp(grappleKey))
             {
                 hook.triggerHook(cameraTransform.position, cameraTransform.forward);
             }

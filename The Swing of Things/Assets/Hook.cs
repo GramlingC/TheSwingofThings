@@ -9,9 +9,11 @@ public class Hook : MonoBehaviour {
 	public Color stringColor = Color.cyan;
 	public LayerMask mask;
 
-	public float springConstant = 300f;
+	public float springConstant = 100f;
 
-	public float springRatio = 20f;
+	public float springRatio = .5f;
+
+	public Camera camera;
 
     [HideInInspector]public bool lineIsActive = false;
 
@@ -104,12 +106,17 @@ public class Hook : MonoBehaviour {
 		{
 			applyGrapple();
 		}
+
+		if (rb.velocity.magnitude > 50f)
+		{
+			camera.fieldOfView = 60f + 20f * (rb.velocity.magnitude - 50f) / 100f;
+		}
 	}
 
 	void applyGrapple()
 	{
         //check for and update grapplePoint if the line hits something new and closer while swinging
-		//castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
+		castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
 
 		float distanceMultiplier = springRatio + 1f;
 	/*
@@ -152,7 +159,7 @@ public class Hook : MonoBehaviour {
 
 			springPull *= springForce;
 		}
-		else if (Vector3.Distance(transform.position,grapplePoint) < grappleDistance)
+		else if (Vector3.Distance(transform.position,grapplePoint) > 10f)
 		{
 			grappleDistance = Vector3.Distance(transform.position,grapplePoint);
 		}
