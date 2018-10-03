@@ -12,7 +12,10 @@ public class Hook : MonoBehaviour {
 	public float springConstant = 300f;
 
 	public float springRatio = 20f;
-	private Rigidbody rb;
+
+    [HideInInspector]public bool lineIsActive = false;
+
+    private Rigidbody rb;
 
 	private Vector3 velocity;
 
@@ -26,6 +29,8 @@ public class Hook : MonoBehaviour {
 
 	private float grappleDistance = 0f;
 
+    
+
 
 	// Use this for initialization
 	void Start () {
@@ -34,17 +39,20 @@ public class Hook : MonoBehaviour {
 		line.startColor = stringColor;
 		linePositions = new List<Vector3>();
 	}
-	
-	public void triggerHook(Vector3 from, Vector3 to)
+	//returned value represents whether or not the hook hit something
+	public bool triggerHook(Vector3 from, Vector3 to)
 	{
 		if (grapplePoint == Vector3.zero)
 		{
-			castGrapple(from, to, Mathf.Infinity);
+			return castGrapple(from, to, Mathf.Infinity);
 		}
 		else
 		{
+            Debug.Log("disconnecting line");
 			grapplePoint = Vector3.zero;
+            lineIsActive = false;
 			line.enabled = false;
+            return false;
 		}
 	}
 
@@ -62,9 +70,10 @@ public class Hook : MonoBehaviour {
 
 	void updateLinePositions()
 	{
-
+        
 		if (!line.enabled)
 		{
+            lineIsActive = true;
 			line.enabled = true;
 			linePositions.Clear();
 		}
@@ -72,8 +81,8 @@ public class Hook : MonoBehaviour {
 		linePositions.Add(grapplePoint);
 	}
 
-
-	void castGrapple(Vector3 from, Vector3 to, float distance)
+    //bool represents raycast hit something or not
+	bool castGrapple(Vector3 from, Vector3 to, float distance)
 	{
 		RaycastHit hit;
 		Debug.DrawRay(from,to, Color.cyan);
@@ -81,8 +90,12 @@ public class Hook : MonoBehaviour {
 		{
 			grapplePoint = hit.point;
 			grappleDistance = hit.distance;
+            //grapple hit! so call the setup fxn to mark the line as active and to start the lineRenderer showing the line.
 			updateLinePositions();
+            return true;
 		}
+        return false;
+
 	}
 
 	void FixedUpdate()
@@ -95,7 +108,8 @@ public class Hook : MonoBehaviour {
 
 	void applyGrapple()
 	{
-		castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
+        //check for and update grapplePoint if the line hits something new and closer while swinging
+		//castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
 
 		float distanceMultiplier = springRatio + 1f;
 	/*

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[RequireComponent(typeof(Hook))]
 public class PlayerMovement : MonoBehaviour {
 
 
@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour {
 	public float moveMultiplier = 30f;
 	public float boostForce = 50f;
 	public float turnSpeed = 1f;
+    public KeyCode boostKey, grappleKey;
 
 	public LayerMask mask;
 
@@ -38,17 +39,29 @@ public class PlayerMovement : MonoBehaviour {
 		float vinput = Input.GetAxisRaw("Vertical");
 		float hinput = Input.GetAxisRaw("Horizontal");
 
-		bool boost = Input.GetKeyDown(KeyCode.Space);
+		bool boost = Input.GetKeyDown(boostKey);
 
 		inputVector = transform.forward*vinput *moveMultiplier;//new Vector3(hinput,0f,vinput).normalized * 10f;
 
 
 		movePlayer(inputVector, boost);
-
-		if (Input.GetKeyDown(KeyCode.LeftShift))
-		{
-			hook.triggerHook(cameraTransform.position, cameraTransform.forward);
-		}
+        //get key down will release an existing grapple
+        if (hook.lineIsActive)
+        {
+            if (Input.GetKeyDown(grappleKey))
+            {
+                hook.triggerHook(cameraTransform.position, cameraTransform.forward);
+            }
+        }
+        else
+        {
+            //but if there is not yet an existing grapple, get key will try to grapple every frame until a connection is made
+            if (Input.GetKey(grappleKey))
+            {
+                hook.triggerHook(cameraTransform.position, cameraTransform.forward);
+            }
+        }
+		
 	}
 
 	void movePlayer(Vector3 input, bool boost)
