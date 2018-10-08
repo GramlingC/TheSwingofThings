@@ -9,6 +9,8 @@ public class Hook : MonoBehaviour {
 	public Color stringColor = Color.cyan;
 	public LayerMask mask;
 
+	public float maxSpeed = 300f;
+
 	public float springConstant = 100f;
 
 	public float springRatio = .5f;
@@ -31,8 +33,9 @@ public class Hook : MonoBehaviour {
 
 	private float grappleDistance = 0f;
 
-    
+	//private Vector2 reticlePos;
 
+    
 
 	// Use this for initialization
 	void Start () {
@@ -109,7 +112,17 @@ public class Hook : MonoBehaviour {
 
 		if (rb.velocity.magnitude > 50f)
 		{
-			camera.fieldOfView = 60f + 20f * (rb.velocity.magnitude - 50f) / 100f;
+			float desiredFOV = 60f + 20f * (rb.velocity.magnitude - 50f) / 100f;
+			camera.fieldOfView = Mathf.Lerp(camera.fieldOfView,desiredFOV,.25f);
+		}
+		else
+		{
+			camera.fieldOfView = 60f;
+		}
+
+		if (rb.velocity.magnitude > 300f)
+		{
+			rb.velocity = Vector3.ClampMagnitude(rb.velocity,300f); 
 		}
 	}
 
@@ -119,35 +132,8 @@ public class Hook : MonoBehaviour {
 		castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
 
 		float distanceMultiplier = springRatio + 1f;
-	/*
-		else if (Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
-		{
-			Vector3 cross1 = Vector3.Cross(rb.velocity,transform.position-grapplePoint).normalized;
-			Vector3 cross2 = Vector3.Cross(cross1,transform.position-grapplePoint).normalized;
-			Debug.Log((transform.position-grapplePoint).normalized);
-			Debug.Log(cross1);
-			Debug.Log(cross2);
-			Debug.Log(Vector3.Dot(cross2,rb.velocity.normalized));
-			Debug.Log(rb.velocity.normalized);
-			rb.velocity = cross2 * -rb.velocity.magnitude;
-		}
-	*/
 
-
-		
-		
-		/*if (Vector3.Distance(transform.position,grapplePoint) >= (springRatio*grappleDistance)+grappleDistance)
-		{
-			Vector3 cross1 = Vector3.Cross(rb.velocity,transform.position-grapplePoint).normalized;
-			Vector3 cross2 = Vector3.Cross(cross1,transform.position-grapplePoint).normalized;
-			Vector3 tangentVelocity = cross2 * -rb.velocity.magnitude;
-			rb.velocity = tangentVelocity;
-			//float centripetalForce = tangentVelocity.magnitude*tangentVelocity.magnitude*rb.mass;
-			//centripetalForce /= grappleDistance;
-
-		}*/
-
-		Vector3 springPull = (grapplePoint-transform.position).normalized + .5f * (grapplePoint-transform.position);
+		Vector3 springPull = 2f * (grapplePoint-transform.position).normalized + .5f * (grapplePoint-transform.position);
 		 
 		if (distanceMultiplier * Vector3.Distance(transform.position,grapplePoint) >= grappleDistance)
 		{
@@ -155,16 +141,16 @@ public class Hook : MonoBehaviour {
 			//transform.position = transform.position + diff * ((grapplePoint-transform.position).normalized);
 			
 			float springFunction = (diff)/((grappleDistance)*springRatio);
-			float springForce = springFunction*springFunction*springConstant;
+			float springForce = springFunction*springFunction;
 
 			springPull *= springForce;
 		}
-		else if (Vector3.Distance(transform.position,grapplePoint) > 10f)
+		else if (Vector3.Distance(transform.position,grapplePoint) > 5f)
 		{
-			grappleDistance = Vector3.Distance(transform.position,grapplePoint);
+			grappleDistance = distanceMultiplier * Vector3.Distance(transform.position,grapplePoint);
 		}
 		
-		rb.AddForce(springPull * Time.deltaTime);
+		rb.AddForce(springPull * springConstant * Time.deltaTime);
 	}
 
 	 void OnGUI(){
