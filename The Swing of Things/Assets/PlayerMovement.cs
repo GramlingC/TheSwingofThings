@@ -43,6 +43,8 @@ public class PlayerMovement : MonoBehaviour {
 
 		inputVector = transform.forward*vinput *moveMultiplier;//new Vector3(hinput,0f,vinput).normalized * 10f;
 
+		hook.getReticle(cameraTransform.position, cameraTransform.forward);
+
 
 		movePlayer(inputVector, boost);
         //get key down will release an existing grapple
@@ -61,15 +63,15 @@ public class PlayerMovement : MonoBehaviour {
                 hook.triggerHook(cameraTransform.position, cameraTransform.forward);
             }
         }
-		
 	}
 
 	void movePlayer(Vector3 input, bool boost)
 	{
 		rb.AddForce(input);
-		if (boost)
+		if (boost && GetComponent<ParticleSystem>().isStopped)
 		{
-			rb.AddForce(transform.forward*boostForce,ForceMode.Impulse);
+			rb.AddForce(-(transform.forward * boostForce) - (rb.velocity),ForceMode.Impulse);
+			GetComponent<ParticleSystem>().Play();
 		}
 	}
 }

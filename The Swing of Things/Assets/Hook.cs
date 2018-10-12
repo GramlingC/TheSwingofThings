@@ -11,6 +11,8 @@ public class Hook : MonoBehaviour {
 
 	public float maxSpeed = 300f;
 
+	public float maxHookDistance = 300f;
+
 	public float springConstant = 100f;
 
 	public float springRatio = .5f;
@@ -33,7 +35,7 @@ public class Hook : MonoBehaviour {
 
 	private float grappleDistance = 0f;
 
-	//private Vector2 reticlePos;
+	private bool hookPossible;
 
     
 
@@ -49,15 +51,27 @@ public class Hook : MonoBehaviour {
 	{
 		if (grapplePoint == Vector3.zero)
 		{
-			return castGrapple(from, to, Mathf.Infinity);
+			return castGrapple(from, to, maxHookDistance);
 		}
 		else
 		{
-            Debug.Log("disconnecting line");
 			grapplePoint = Vector3.zero;
             lineIsActive = false;
 			line.enabled = false;
             return false;
+		}
+	}
+
+	public void getReticle(Vector3 from, Vector3 to)
+	{
+		RaycastHit hit;
+		if (Physics.Raycast(from, to, out hit, maxHookDistance, mask))
+		{
+			hookPossible = true;
+		}
+		else
+		{
+			hookPossible = false;
 		}
 	}
 
@@ -75,7 +89,6 @@ public class Hook : MonoBehaviour {
 
 	void updateLinePositions()
 	{
-        
 		if (!line.enabled)
 		{
             lineIsActive = true;
@@ -95,6 +108,7 @@ public class Hook : MonoBehaviour {
 		{
 			grapplePoint = hit.point;
 			grappleDistance = hit.distance;
+			Debug.Log(grappleDistance);
             //grapple hit! so call the setup fxn to mark the line as active and to start the lineRenderer showing the line.
 			updateLinePositions();
             return true;
@@ -123,6 +137,15 @@ public class Hook : MonoBehaviour {
 		if (rb.velocity.magnitude > 300f)
 		{
 			rb.velocity = Vector3.ClampMagnitude(rb.velocity,300f); 
+		}
+
+		if (transform.position.y > 200f)
+		{
+			rb.drag = 0.1f * (transform.position.y - 200f) / 200f;
+		}
+		else
+		{
+			rb.drag = 0f;
 		}
 	}
 
@@ -154,6 +177,8 @@ public class Hook : MonoBehaviour {
 	}
 
 	 void OnGUI(){
-     GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), "");
+		 //if (hookPossible)
+    		// GUI.Box(new Rect(reticlePos.x,reticlePos.y, 10, 10), "");
+		GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), "");
   }
 }
