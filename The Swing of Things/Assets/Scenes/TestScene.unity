@@ -9109,6 +9109,12 @@ Prefab:
       propertyPath: InitialModule.startLifetime.scalar
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114405496891263346, guid: d0c82679c1eafba49970047a6b4e5c9a,
+        type: 2}
+      propertyPath: pointObject
+      value: 
+      objectReference: {fileID: 1766074376156348, guid: ceeb3f4e00f43d2469d562c98cf7d8b0,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d0c82679c1eafba49970047a6b4e5c9a, type: 2}
   m_IsPrefabParent: 0
@@ -17667,19 +17673,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1843877358031412, guid: 56167c4d690af9243a994b449bd872a6, type: 2}
       propertyPath: m_Layer
-      value: 11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1202314746320514, guid: 56167c4d690af9243a994b449bd872a6, type: 2}
       propertyPath: m_Layer
-      value: 11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1856059987421244, guid: 56167c4d690af9243a994b449bd872a6, type: 2}
       propertyPath: m_Layer
-      value: 11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1157810813655686, guid: 56167c4d690af9243a994b449bd872a6, type: 2}
       propertyPath: m_Layer
-      value: 11
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 56167c4d690af9243a994b449bd872a6, type: 2}

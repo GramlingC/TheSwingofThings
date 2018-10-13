@@ -19,6 +19,8 @@ public class Hook : MonoBehaviour {
 
 	public Camera camera;
 
+	public GameObject pointObject;
+
     [HideInInspector]public bool lineIsActive = false;
 
     private Rigidbody rb;
@@ -31,11 +33,17 @@ public class Hook : MonoBehaviour {
 
 	private List<Vector3> linePositions;
 
+	private List<GameObject> linePoints;
+
 	private LineRenderer line;
 
 	private float grappleDistance = 0f;
 
 	private bool hookPossible;
+
+	private GameObject lastTarget;
+
+	private Vector3 lastTargetPosition;
 
     
 
@@ -45,6 +53,7 @@ public class Hook : MonoBehaviour {
 		line = GetComponentInChildren<LineRenderer>();
 		line.startColor = stringColor;
 		linePositions = new List<Vector3>();
+		linePoints = new List<GameObject>();
 	}
 	//returned value represents whether or not the hook hit something
 	public bool triggerHook(Vector3 from, Vector3 to)
@@ -58,6 +67,7 @@ public class Hook : MonoBehaviour {
 			grapplePoint = Vector3.zero;
             lineIsActive = false;
 			line.enabled = false;
+			linePoints.Clear();
             return false;
 		}
 	}
@@ -80,6 +90,11 @@ public class Hook : MonoBehaviour {
 		
 		if (line.enabled)
 		{
+			linePositions.Clear();
+			for (int i = 0; i < linePoints.Count; i++)
+			{
+				linePositions.Add(linePoints[i].transform.position);
+			}
 			linePositions.Add(transform.position);
 			line.positionCount = linePositions.Count;
 			line.SetPositions(linePositions.ToArray());
@@ -106,9 +121,18 @@ public class Hook : MonoBehaviour {
 		Debug.DrawRay(from,to, Color.cyan);
 		if (Physics.Raycast(from, to, out hit, distance, mask))
 		{
+			GameObject point = Instantiate(pointObject) as GameObject;
+			point.transform.position = hit.point;
+			point.transform.parent = hit.transform;
+			if (!line.enabled)
+				linePoints.Clear();
+			linePoints.Add(point);
+
+			lastTarget = hit.transform.gameObject;
+			lastTargetPosition = lastTarget.transform.position;
 			grapplePoint = hit.point;
 			grappleDistance = hit.distance;
-			Debug.Log(grappleDistance);
+
             //grapple hit! so call the setup fxn to mark the line as active and to start the lineRenderer showing the line.
 			updateLinePositions();
             return true;
@@ -151,6 +175,15 @@ public class Hook : MonoBehaviour {
 
 	void applyGrapple()
 	{
+		grapplePoint = linePoints[linePoints.Count-1].transform.position;
+		/*if (lastTarget.transform.position != lastTargetPosition)
+		{
+			Vector3 delta =  lastTarget.transform.position - lastTargetPosition;
+			lastTargetPosition = lastTarget.transform.position;
+			grapplePoint += delta;
+			linePositions.Clear();
+			linePositions.Add(grapplePoint); 
+		}*/
         //check for and update grapplePoint if the line hits something new and closer while swinging
 		castGrapple(transform.position,grapplePoint-transform.position,Vector3.Distance(transform.position,grapplePoint)-5f);
 
